@@ -1,6 +1,70 @@
-#import 套件
+# import packages
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 import openpyxl
 import seaborn as sns
+from IPython.display import display     # show for beautiful
+
+# read data
+a=pd.read_excel(r"C:\Users\Desktop\Online Retail.xlsx")
+
+# describtive statistic and some imformation about data
+print(a.shape)
+print(a.columns)
+print(a.describe())
+print(a.info())
+
+# clean data
+a=a.dropna(how="any")
+a=a.drop_duplicates()
+a["CustomerID"]=a["CustomerID"].astype("int")
+a["CustomerID"]=a["CustomerID"].astype("str")
+a=a[a["UnitPrice"]>0]
+c=a
+c=c.drop(c[c["Description"].str.contains(r'\?')].index)  
+
+# clean data
+b=a
+b=b.dropna()
+b=b.drop_duplicates()
+b=b.drop(columns=["Description","InvoiceDate"])
+b.sort_values(by="CustomerID",ascending=True,inplace=True)
+b=b.reset_index()
+b=b.drop(columns=["index"])
+
+
+
+# Revenue Share by Region
+b["Country"]=b["Country"].replace("Unspecified","Others")
+b_loc=pd.DataFrame({"Quantity":b["Quantity"],"UnitPrice":b["UnitPrice"],"Country":b["Country"]})
+b_loc=b_loc.sort_values(by="Country")
+
+loc_rev=pd.DataFrame({"Country":b_loc["Country"],"Revenue":0.0})
+loc_rev=loc_rev.drop_duplicates()
+
+temp_price=0.0
+j=0
+for i in range(b["Country"].count()-1):
+    temp_price=temp_price+b_loc.iloc[i,0]*b_loc.iloc[i,1]
+    if b_loc.iloc[i,2] != b_loc.iloc[i+1,2]:
+        loc_rev.iloc[j,1]=temp_price
+        temp_price=0
+        j=j+1
+
+if b_loc.iloc[i+1,2] == b_loc.iloc[i,2]:
+    temp_price=temp_price+b_loc.iloc[i+1,0]*b_loc.iloc[i+1,1]
+else:
+    temp_price=b_loc.iloc[i+1,0]*b_loc.iloc[i+1,1]
+loc_rev.iloc[j,1]=temp_price
+
+
+## Revenue Share by Region(graph)
+n=10
+loc_rev_t=loc_rev.nlargest(n=n,columns=["Revenue"])
+loc_rev_t=loc_rev_t.sort_values(by=["Revenue"],ascending=False)
+
+plt.figure(figsize=(15,6))
+plt.bar(loc_rev_t["Country"],loc_rev_t["Revenue"],color="blue")
+plt.show()
+   
