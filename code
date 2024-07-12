@@ -6,14 +6,17 @@ import openpyxl
 import seaborn as sns
 from IPython.display import display     # show for beautiful
 
+
 # read data
 a=pd.read_excel(r"C:\Users\Desktop\Online Retail.xlsx")
+
 
 # describtive statistic and some imformation about data
 print(a.shape)
 print(a.columns)
 print(a.describe())
 print(a.info())
+
 
 # clean data
 a=a.dropna(how="any")
@@ -24,6 +27,7 @@ a=a[a["UnitPrice"]>0]
 c=a
 c=c.drop(c[c["Description"].str.contains(r'\?')].index)  
 
+
 # clean data
 b=a
 b=b.dropna()
@@ -33,6 +37,7 @@ b.sort_values(by="CustomerID",ascending=True,inplace=True)
 b=b.reset_index()
 b=b.drop(columns=["index"])
 
+===============================================================
 
 
 # Revenue Share by Region
@@ -67,4 +72,54 @@ loc_rev_t=loc_rev_t.sort_values(by=["Revenue"],ascending=False)
 plt.figure(figsize=(15,6))
 plt.bar(loc_rev_t["Country"],loc_rev_t["Revenue"],color="blue")
 plt.show()
-   
+
+
+===============================================================
+
+
+# season sales in UK
+c["InvoiceDate"] = pd.to_datetime(c["InvoiceDate"], format='%Y/%m/%d %H:%M')
+c["year"]=c['InvoiceDate'].dt.year
+c["month"]=c['InvoiceDate'].dt.month
+c["day"]=c['InvoiceDate'].dt.day
+c["hour"]=c['InvoiceDate'].dt.hour
+c["minute"]=c['InvoiceDate'].dt.minute
+
+
+# season month[{3 4 5:"spring",6 7 8:"summer",9 10 11:"fall", 12 1 2:"winter"}]
+c_UK=c[c["Country"]=="United Kingdom"]
+
+c_UK.loc[(c_UK["month"]>=3) & (c_UK["month"]<=5),"season"]="spring"
+c_UK.loc[(c_UK["month"]>=6) & (c_UK["month"]<=8),"season"]="summer"
+c_UK.loc[(c_UK["month"]>=9) & (c_UK["month"]<=11),"season"]="fall"
+c_UK.loc[(c_UK["month"]==12) | (c_UK["month"]<=2),"season"]="winter"
+c_UK=c_UK.sort_values(by=["season"],ascending=False)
+
+season=["spring","summer","fall","winter"]
+data=[0.0,0.0,0.0,0.0]
+ss=pd.DataFrame([data],columns=season)
+
+k=0
+for i in season:
+    R=c_UK[c_UK["season"]==i]
+    R=R.loc[:,["Quantity","UnitPrice"]]
+    temp=0
+    Ri=R.describe()
+    # print(Ri)
+    for j in range(R["Quantity"].count()):
+        temp=R.iloc[j,0]*R.iloc[j,1]+temp
+    
+    ss.iloc[0,k]=temp
+    k=k+1    
+
+## season sales in UK(graph)
+plt.figure(figsize=(15,6))
+plt.xlabel("season",fontsize=20)
+plt.ylabel("revenue",fontsize=20)
+plt.title("season sales in UK")
+plt.bar(x=season,height=ss.iloc[0,:],color="black")
+
+
+===============================================================
+
+
