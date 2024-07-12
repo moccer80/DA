@@ -1,0 +1,6 @@
+#import 套件
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+import openpyxl
+import seaborn as sns
