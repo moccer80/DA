@@ -161,3 +161,65 @@ plt.show()
 
 ===============================================================
 
+
+# find the monthly quantity trend in best-selling product in UK
+ffit=fall_go["Description"]
+for k in ffit:
+    topsale=c[c["Description"]==k]
+    topsale=topsale.sort_values(by="month",ascending=True)
+    coll=["1","2","3","4","5","6","7","8","9","10","11","12"]
+    topsale_stor = pd.DataFrame(0, index=range(1), columns=coll)
+    q=0
+
+    for j in range(1,13):
+        A=topsale[topsale["month"]==j]
+        if A.empty == True:
+            topsale_stor.iloc[0,j-1]=q
+            continue
+        for i in range(A["Description"].count()):
+            q=q+A.iloc[i,3]
+        topsale_stor.iloc[0,j-1]=q
+        q=0
+   
+
+    ## find the monthly quantity trend in best-selling product in UK(graph)
+    plt.figure(figsize=(10,6))
+    plt.plot(coll,topsale_stor.iloc[0,:],marker=".")
+    plt.xlabel("month",fontsize=20)
+    plt.ylabel("quantity",fontsize=20)
+    plt.title(k)
+    plt.show()
+
+
+===============================================================
+
+
+# Find the trend about product "WARMER" 
+WAR=c[c["Description"].str.contains("WARMER")]
+WAR=WAR["Description"]
+WAR=WAR.drop_duplicates()
+
+for k in WAR:
+    topsale=c[c["Description"]==k]
+    topsale=topsale.sort_values(by="month",ascending=True)
+    coll=["1","2","3","4","5","6","7","8","9","10","11","12"]
+    topsale_stor = pd.DataFrame(0, index=range(1), columns=coll)
+    q=0
+
+    for j in range(1,13):
+        A=topsale[topsale["month"]==j]
+        if A.empty == True:
+            topsale_stor.iloc[0,j-1]=q
+            continue
+        for i in range(A["Description"].count()):
+            q=q+A.iloc[i,3]
+        topsale_stor.iloc[0,j-1]=q
+        q=0
+
+    #Find the trend about product "WARMER"(graph)
+    plt.figure(figsize=(10,6))
+    plt.plot(coll,topsale_stor.iloc[0,:],marker=".")
+    plt.xlabel("month",fontsize=20)
+    plt.ylabel("quantity",fontsize=20)
+    plt.title(k)
+    plt.show()
