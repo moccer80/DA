@@ -1,5 +1,3 @@
-# EDA
-
 ## Action plan
 
 1. Due to low sales warmers and hot water bottles in spring and summer and rising sales in autumn and winter, reduce inventory in spring and summer to minimize storage and management costs. Increase inventory in autumn and winter to meet higher sales demand. Additionally, since customers preparing to leave the warm indoors for the cold outdoors may want something to keep them warm, set up a winter warm product section near the exit to make it convenient for customers to grab items and boost sales.
