@@ -29,6 +29,6 @@ and so on
 ![image](https://github.com/user-attachments/assets/fefd2241-688a-4ba4-bbb0-56de823c09a5)
 and so on
 
-### Christmas goods quantity trend in month
+### best and less sold Christmas goods 
 ![image](https://github.com/user-attachments/assets/c8843e01-03e2-4a71-a655-cd3c471158f3)
 ![image](https://github.com/user-attachments/assets/e748e52b-4fd5-4624-8cbe-dc00831307ed)
