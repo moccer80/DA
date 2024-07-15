@@ -253,3 +253,92 @@ print(pval)
 ===============================================================
 
 
+# Find the trend about Chrismas product  
+stat=None
+WAR=c[c["Description"].str.contains("CHRISTMAS")]
+WAR=WAR["Description"]
+WAR=WAR.drop_duplicates()
+
+for k in WAR:
+
+    topsale=c[c["Description"]==k]
+    topsale=topsale.sort_values(by="month",ascending=True)
+    coll=["1","2","3","4","5","6","7","8","9","10","11","12"]
+    topsale_stor = pd.DataFrame(0, index=[k], columns=coll)     #index要用[]括起來
+    
+
+    q=0
+    for j in range(1,13):
+        A=topsale[topsale["month"]==j]
+        if A.empty == True:
+            topsale_stor.iloc[0,j-1]=q
+            continue
+        for i in range(A["Description"].count()):
+            q=q+A.iloc[i,3]
+        topsale_stor.iloc[0,j-1]=q
+        q=0
+    stat=pd.concat([stat,topsale_stor],axis=0)
+
+
+===============================================================
+
+
+# test the hyphothesis that in month 10 11 12, the average sale of Chrismas product is higher than other month.
+TP1=pd.DataFrame({"T":0.0,"pval":0.0},index=stat.index)
+for j in stat.index:
+    stat_temp=pd.DataFrame(stat.loc[j,:]).T
+    stat_sum=stat_temp.iloc[0,:9]
+    stat_win=stat_temp.iloc[0,[9,10,11]]
+    T,pval=stats.ttest_ind(stat_sum,stat_win,alternative="less")
+    TP1.loc[j,"T"]=T
+    TP1.loc[j,"pval"]=pval
+    
+tmean=TP1["T"].mean()
+p_value =1 - stats.t.cdf(abs(tmean), 149)
+print(p_value)
+
+
+===============================================================
+
+
+# find the best-selling product about Christmas
+b="CHRISTMAS"
+SK=c[c["Description"].str.contains(b)]
+SK=SK.sort_values(by=["Description"],ascending=True)
+SK1=SK["Description"].drop_duplicates()
+SK2=pd.DataFrame({"Description":SK1,"Q":0.0})
+SK2=SK2.set_index("Description")
+
+q=0
+for j in SK1:
+    CH=SK[SK["Description"]==j]
+    for i in range(CH["Description"].count()):
+        q=q+CH.iloc[i,3]
+    SK2.loc[j,:]=q
+    q=0
+
+SK2=SK2[SK2["Q"]>=0]
+SK_big=SK2.nlargest(10,columns=["Q"])
+SK_small=SK2.nsmallest(10,columns=["Q"])
+print(SK2.shape)
+
+
+===============================================================
+
+
+# find the best-selling product about Christmas(graph)
+plt.figure(figsize=(15,6))
+plt.title("The quantity of CHRISTMAS goods sold",fontsize=20)
+plt.bar(x=SK_big.index,height=SK_big["Q"],color="blue")
+plt.xticks(rotation=20)
+plt.xlabel("goods")
+plt.ylabel("Q")
+plt.show()
+
+plt.figure(figsize=(15,6))
+plt.title("The quantity of CHRISTMAS goods sold",fontsize=20)
+plt.bar(x=SK_small.index,height=SK_small["Q"],color="black")
+plt.xticks(rotation=20)
+plt.xlabel("goods")
+plt.ylabel("Q")
+plt.show()
