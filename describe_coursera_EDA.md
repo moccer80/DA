@@ -7,3 +7,10 @@
 
 1. Observing high UK sales in autumn and noting hot water bottles among the top 15 items, I hypothesized increased demand for warming products in autumn and winter. Using keywords like "WARMER" and "HOT WATER," I analyzed sales data. From September to February, 23 of 44 warming products had significantly higher sales, with an average T-value p-value of 0.0569, indicating higher demand in colder months. To optimize inventory and meet customer needs, I proposed targeted strategies.
 2. For Christmas products, to avoid excess post-holiday inventory, bundle popular and less popular items, such as the Wooden Heart Christmas Scandinavian, Paper Chain Kit, and Pink Christmas Flock Droplet, into a discounted decoration set to boost sales.
+
+
+Graph
+![image](https://github.com/user-attachments/assets/fd2678a6-3c5f-4d99-a1be-b0acdfcb09d9)
+![image](https://github.com/user-attachments/assets/507fbbf6-8c17-44ef-bef1-8624ed50c13d)
+![image](https://github.com/user-attachments/assets/4e41b10e-f71c-4804-af4d-2a32072013d4)
+
