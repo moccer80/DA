@@ -9,9 +9,13 @@
 2. For Christmas products, to avoid excess post-holiday inventory, bundle popular and less popular items, such as the Wooden Heart Christmas Scandinavian, Paper Chain Kit, and Pink Christmas Flock Droplet, into a discounted decoration set to boost sales.
 
 
-Graph
+## Graph
+### revenue share by region
 ![image](https://github.com/user-attachments/assets/fd2678a6-3c5f-4d99-a1be-b0acdfcb09d9)
+
+### UK season sales
 ![image](https://github.com/user-attachments/assets/507fbbf6-8c17-44ef-bef1-8624ed50c13d)
+
 ![image](https://github.com/user-attachments/assets/4e41b10e-f71c-4804-af4d-2a32072013d4)
 ![image](https://github.com/user-attachments/assets/44676c21-3cd8-40db-b38a-1f27741125a0)
 
@@ -23,3 +27,5 @@ and so on
 ![image](https://github.com/user-attachments/assets/fefd2241-688a-4ba4-bbb0-56de823c09a5)
 and so on
 
+![image](https://github.com/user-attachments/assets/c8843e01-03e2-4a71-a655-cd3c471158f3)
+![image](https://github.com/user-attachments/assets/e748e52b-4fd5-4624-8cbe-dc00831307ed)
