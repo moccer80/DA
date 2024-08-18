@@ -34,12 +34,16 @@ de=de.drop(columns=["loan","campaign","previous"])
 
 # 資料視覺化
 
+# y
+sns.countplot(x="y",data=de)
+plt.show()
+
 
 # job
 plt.figure(figsize=(14,8))
 sns.countplot(x="job",data=de,hue="y",)
 plt.xticks(rotation=45)
-plt.plot()
+plt.show()
 
 a=[]
 b=[]
