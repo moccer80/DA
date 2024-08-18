@@ -179,16 +179,12 @@ full.loc[:,"education"].astype("int")
 
 
 # 模型前置設定
-display(full.head())
-print(full.isna().sum())
 full["y"]=full["y"].replace({"no":0,"yes":1})
 train=full[full["y"].isna()==False]
 yes=train[train["y"]==1]
 for i in range(3):
     yes=pd.concat([yes,yes])
-
-print(train.shape)
-print(yes.shape)    
+  
 train=pd.concat([train,yes])
 train_x=train.drop(columns="y")
 train_y=train["y"]
@@ -212,7 +208,6 @@ rf=RandomForestClassifier(n_estimators=1000,class_weight={0:0.7,1:0.3},n_jobs=6,
 rf.fit(train_x,train_y)
 p=pd.Series(rf.predict(test_x),name="y")
 feature=pd.DataFrame({"feature_name":rf.feature_names_in_,"feature_importance":rf.feature_importances_})
-print(p.value_counts())
 feature.plot(x="feature_name",kind="bar")
 
 
