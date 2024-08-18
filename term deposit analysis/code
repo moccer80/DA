@@ -1,0 +1,231 @@
+
+# 引入套件
+import pandas as pd
+import numpy as np  
+from IPython.display import display
+import matplotlib.pyplot as plt
+import seaborn as sns       
+
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.ensemble import RandomForestRegressor
+from sklearn import preprocessing 
+from sklearn.model_selection import GridSearchCV
+from sklearn.metrics import confusion_matrix
+
+
+
+# 引入資料與檢視
+pd.set_option("display.max_columns",None)
+pd.set_option("display.precision",4)
+de=pd.read_csv(r"C:\Users\mocce\Desktop\python\kaggle\deposit\train.csv",sep=",")
+test=pd.read_csv(r"C:\Users\mocce\Desktop\python\kaggle\deposit\test.csv",sep=",")
+
+display(de.head())
+print(de.info())
+print(de.describe())
+print(de.shape)
+print(de.duplicated().sum())
+print("=======")
+display(test.head())
+print(test.shape)
+print(test.info())
+
+
+# 資料說明不清與重複，故清除loan、campaign、previous欄位
+test=test.drop(columns=["y","loan","campaign","previous"])
+de=de.drop(columns=["loan","campaign","previous"])
+
+# 資料視覺化
+
+# job
+plt.figure(figsize=(14,8))
+sns.countplot(x="job",data=de,hue="y",)
+plt.xticks(rotation=45)
+plt.plot()
+
+
+a=[]
+b=[]
+for i in de["job"].unique():
+    A=de[(de["job"]==i) & (de["y"]=="yes")]
+    B=de[de["job"]==i]
+    pec=len(A)/len(B)
+    a.append(i)
+    b.append(pec)
+
+df=pd.DataFrame({"job":a,"having term deposit ratio":b}).sort_values(by="having term deposit ratio",ascending=False)
+df.plot(x="job",kind="bar")
+# 成功推銷定存比例最高的族群是學生，其次是退休人群
+
+
+# marital
+sns.countplot(x="marital",data=de,hue="y")
+plt.show()
+
+
+# education
+sns.countplot(x="education",data=de,hue="y")
+plt.show()
+# tertiary成功推銷定存的比例較高
+
+
+# default
+sns.countplot(x="default",data=de,hue="y")
+plt.show()
+# 違約的總人數極少
+# 資訊含量低，丟掉
+
+
+# housing
+sns.countplot(x="housing",data=de,hue="y")
+plt.show()
+# 沒有房貸的人存定存的比例較高
+
+
+# contact
+sns.countplot(x="contact",data=de,hue="y")
+plt.show()
+
+
+# day
+sns.countplot(x="day",data=de,hue="y")
+plt.show()
+
+# %%
+sns.countplot(x="poutcome",data=de,hue="y")
+plt.show()
+# 前一次有存定存的下一次存定存的比例高、但數量太少
+
+
+# 視覺化連續型欄位
+
+def kde(data,var):
+    plt.figure(figsize=(12,8))
+    sns.kdeplot(data=data[var],color="blue",fill=True,bw_adjust=0.5)
+    plt.title(f"{var} distribution")
+    plt.xlabel(var)
+    plt.ylabel("density")
+    plt.xlim((data[var].quantile(0),data[var].quantile(0.975)))
+    plt.show()
+
+# age
+kde(de,"age")
+a=sns.FacetGrid(data=de,col="y")
+plt.figure(figsize=(12,8))
+a.map(sns.kdeplot,"age",fill=True)
+# 有存定存的人與沒存定存的人的年齡分布是相似的，不過在65~75歲間存定存的比例較高，與job中有存定存的比例是退休族群較高相符合
+
+
+# balance
+kde(de,"balance")
+
+a=sns.FacetGrid(data=de,col="y",height=6,aspect=8/6)
+a.map(sns.kdeplot,"balance",fill=True,bw_adjust=0.3)
+a.set(xlim=(de["balance"].quantile(0),de["balance"].quantile(0.975)))
+# 大部分人的balance在-1000~2000之間
+# y=1 or =0，density圖形相似，在0<balance<1000的部分 no的部分更高，代表這個區域存定存的人比例偏低
+
+
+# duration
+kde(de,"duration")
+
+a=sns.FacetGrid(data=de,col="y",height=6,aspect=8/6)
+a.map(sns.kdeplot,"duration",fill=True,bw_adjust=0.3)
+a.set(xlim=(de["duration"].quantile(0),de["duration"].quantile(0.975)))
+# 大部分人的duration落在一年內
+# duration 200以下有存定存的比例相對於200以上的低，且yes的部分有厚尾的現象，代表duration長，會存定存的比例較高
+
+# 日期
+sns.countplot(data=de,x="month",hue="y")
+plt.show()
+# 沒有哪個月成交量高很多
+
+# 看數量變數間的相關性
+plt.figure(figsize=(12,7))
+sns.heatmap(de.corr(numeric_only=True),annot=True,cmap="coolwarm")
+# 沒有那些變數特別相關
+
+
+# pdays
+sns.histplot(x="pdays",data=de,hue="y",multiple="stack")
+plt.show()
+# 大部分資料為50天以內
+
+
+# 丟掉default
+full=pd.concat([de,test]).reset_index(drop=True)
+print(full.tail())
+full.drop(columns="default",inplace=True)
+
+
+
+# 轉換成數值形式
+display(full.head())
+def change_code(data,var):
+    data[var]=data[var].astype("category").cat.codes
+
+# job marital housing contact pdays poutcome
+A=["job","marital","housing","contact","pdays","poutcome"]
+for i in A:
+    change_code(full,i)
+
+# month
+full.loc[:,"month"]=full.loc[:,"month"].replace(['may','jun','jul','aug','oct','nov','dec','jan','feb','mar','apr','sep'],[5,6,7,8,10,11,12,1,2,3,4,9])
+
+# education
+full.loc[:,"education"]=full["education"].replace(['tertiary','secondary','unknown','primary'],[2,1,-1,0])
+full.loc[:,"education"].astype("int")
+
+
+# 模型前置設定
+
+display(full.head())
+print(full.isna().sum())
+full["y"]=full["y"].replace({"no":0,"yes":1})
+train=full[full["y"].isna()==False]
+yes=train[train["y"]==1]
+for i in range(3):
+    yes=pd.concat([yes,yes])
+
+print(train.shape)
+print(yes.shape)    
+train=pd.concat([train,yes])
+train_x=train.drop(columns="y")
+train_y=train["y"]
+test=full[full["y"].isna()==True]
+test_x=test.drop(columns="y")
+
+
+
+
+# 找參數
+rf=RandomForestClassifier(oob_score=True,random_state=42,n_jobs=6,max_depth=5,n_estimators=1000)
+param_grid={"criterion":["gini","entropy"],"min_samples_leaf":[250,500,1000,2000,3000],"min_samples_split":[1000,2500,5000,7500]}
+gd=GridSearchCV(estimator=rf,param_grid=param_grid,n_jobs=6,scoring="accuracy",cv=5)
+gs=gd.fit(train_x,train_y)
+print(gs.best_params_)
+print(gs.best_score_)
+
+
+# 套模型
+rf=RandomForestClassifier(n_estimators=1000,class_weight={0:0.7,1:0.3},n_jobs=6,criterion="entropy",min_samples_leaf=500,min_samples_split=1000,random_state=42,max_depth=5)
+rf.fit(train_x,train_y)
+p=pd.Series(rf.predict(test_x),name="y")
+feature=pd.DataFrame({"feature_name":rf.feature_names_in_,"feature_importance":rf.feature_importances_})
+print(p.value_counts())
+feature.plot(x="feature_name",kind="bar")
+
+
+
+#  繪製confusion matrix
+verify=pd.read_csv(r"C:\Users\mocce\Desktop\python\kaggle\deposit\test.csv",sep=",")
+verify=verify["y"].replace({"no":0,"yes":1})
+cm=confusion_matrix(verify,p)
+cm_df = pd.DataFrame(cm)
+plt.figure(figsize=(10, 6))
+sns.heatmap(cm_df, annot=True, fmt='d', cmap='Reds')
+plt.xlabel("predict")
+plt.ylabel("real")
+
+
+
