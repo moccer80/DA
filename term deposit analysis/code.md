@@ -17,17 +17,13 @@ from sklearn.metrics import confusion_matrix
 # 引入資料與檢視
 pd.set_option("display.max_columns",None)
 pd.set_option("display.precision",4)
-de=pd.read_csv(r"C:\Users\mocce\Desktop\python\kaggle\deposit\train.csv",sep=",")
-test=pd.read_csv(r"C:\Users\mocce\Desktop\python\kaggle\deposit\test.csv",sep=",")
+de=pd.read_csv(r"C:\Users\Desktop\train.csv",sep=",")
+test=pd.read_csv(r"C:\Users\Desktop\test.csv",sep=",")
 
 display(de.head())
 print(de.info())
-print(de.describe())
-print(de.shape)
-print(de.duplicated().sum())
 print("=======")
 display(test.head())
-print(test.shape)
 print(test.info())
 
 
