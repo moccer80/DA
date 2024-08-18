@@ -31,14 +31,15 @@ print(test.info())
 test=test.drop(columns=["y","loan","campaign","previous"])
 de=de.drop(columns=["loan","campaign","previous"])
 
+
 # 資料視覺化
+
 
 # job
 plt.figure(figsize=(14,8))
 sns.countplot(x="job",data=de,hue="y",)
 plt.xticks(rotation=45)
 plt.plot()
-
 
 a=[]
 b=[]
@@ -69,7 +70,7 @@ plt.show()
 sns.countplot(x="default",data=de,hue="y")
 plt.show()
 # 違約的總人數極少
-# 資訊含量低，丟掉
+# 資訊含量過低，因此去除此欄位
 
 
 # housing
@@ -87,13 +88,14 @@ plt.show()
 sns.countplot(x="day",data=de,hue="y")
 plt.show()
 
-# %%
+# poutcome
 sns.countplot(x="poutcome",data=de,hue="y")
 plt.show()
-# 前一次有存定存的下一次存定存的比例高、但數量太少
+# 前一次有存定存的下一次存定存的比例高
 
 
 # 視覺化連續型欄位
+
 
 def kde(data,var):
     plt.figure(figsize=(12,8))
@@ -136,7 +138,7 @@ sns.countplot(data=de,x="month",hue="y")
 plt.show()
 # 沒有哪個月成交量高很多
 
-# 看數量變數間的相關性
+# 看數值變數間的相關性
 plt.figure(figsize=(12,7))
 sns.heatmap(de.corr(numeric_only=True),annot=True,cmap="coolwarm")
 # 沒有那些變數特別相關
@@ -152,7 +154,6 @@ plt.show()
 full=pd.concat([de,test]).reset_index(drop=True)
 print(full.tail())
 full.drop(columns="default",inplace=True)
-
 
 
 # 轉換成數值形式
@@ -174,7 +175,6 @@ full.loc[:,"education"].astype("int")
 
 
 # 模型前置設定
-
 display(full.head())
 print(full.isna().sum())
 full["y"]=full["y"].replace({"no":0,"yes":1})
@@ -210,7 +210,6 @@ p=pd.Series(rf.predict(test_x),name="y")
 feature=pd.DataFrame({"feature_name":rf.feature_names_in_,"feature_importance":rf.feature_importances_})
 print(p.value_counts())
 feature.plot(x="feature_name",kind="bar")
-
 
 
 #  繪製confusion matrix
