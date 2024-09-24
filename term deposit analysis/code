@@ -15,91 +15,88 @@ from sklearn.metrics import confusion_matrix
 
 
 # 引入資料與檢視
+# 資料說明不清與重複，故清除loan、campaign、previous欄位
 pd.set_option("display.max_columns",None)
 pd.set_option("display.precision",4)
 de=pd.read_csv("train.csv",sep=",")
-test=pd.read_csv("test.csv",sep=",")
+de["y"].replace({"yes":1,"no":0},inplace=True)
+X=de.drop(columns=["y","loan","campaign","previous"])
+Y=de["y"]
 
-display(de.head())
-print(de.info())
-print("=======")
-display(test.head())
-print(test.info())
-
-
-# 資料說明不清與重複，故清除loan、campaign、previous欄位
-test=test.drop(columns=["y","loan","campaign","previous"])
-de=de.drop(columns=["loan","campaign","previous"])
+x_train,x_test,y_train,y_test=train_test_split(X,Y,test_size=0.2,random_state=42)
+train=pd.merge(x_train,y_train,left_index=True,right_index=True)
+test=pd.merge(x_test,y_test,left_index=True,right_index=True)
 
 
 # 資料視覺化
 
-# y
-sns.countplot(x="y",data=de)
+## y
+sns.countplot(x="y",data=train)
 plt.show()
 
 
-# job
+## job
 plt.figure(figsize=(14,8))
-sns.countplot(x="job",data=de,hue="y",)
+sns.countplot(x="job",data=train,hue="y")
 plt.xticks(rotation=45)
 plt.show()
 
 a=[]
 b=[]
-for i in de["job"].unique():
-    A=de[(de["job"]==i) & (de["y"]=="yes")]
-    B=de[de["job"]==i]
+for i in train["job"].unique():
+    A=train[(train["job"]==i) & (train["y"]==1)]
+    B=train[train["job"]==i]
     pec=len(A)/len(B)
     a.append(i)
     b.append(pec)
 
 df=pd.DataFrame({"job":a,"having term deposit ratio":b}).sort_values(by="having term deposit ratio",ascending=False)
-df.plot(x="job",kind="bar")
+sns.barplot(data=df,x="job",y="having term deposit ratio")
+plt.xticks(rotation=45)
+plt.show()
+# 成功推銷定存比例最高的族群是學生，其次是退休人群
 # 成功推銷定存比例最高的族群是學生，其次是退休人群
 
 
-# marital
-sns.countplot(x="marital",data=de,hue="y")
+## marital
+sns.countplot(x="marital",data=train,hue="y")
 plt.show()
 
 
-# education
-sns.countplot(x="education",data=de,hue="y")
+## education
+sns.countplot(x="education",data=train,hue="y")
 plt.show()
 # tertiary成功推銷定存的比例較高
 
 
-# default
-sns.countplot(x="default",data=de,hue="y")
+## default
+sns.countplot(x="default",data=train,hue="y")
 plt.show()
-# 違約的總人數極少
-# 資訊含量過低，因此去除此欄位
+## 違約的總人數極少
+## 資訊含量過低，因此去除此欄位
 
 
-# housing
-sns.countplot(x="housing",data=de,hue="y")
+## housing
+sns.countplot(x="housing",data=train,hue="y")
 plt.show()
-# 沒有房貸的人存定存的比例較高
+## 沒有房貸的人存定存的比例較高
 
 
-# contact
-sns.countplot(x="contact",data=de,hue="y")
-plt.show()
-
-
-# day
-sns.countplot(x="day",data=de,hue="y")
+## contact
+sns.countplot(x="contact",data=train,hue="y")
 plt.show()
 
-# poutcome
-sns.countplot(x="poutcome",data=de,hue="y")
+## day
+sns.countplot(x="day",data=train,hue="y")
 plt.show()
-# 前一次有存定存的下一次存定存的比例高
+
+## poutcome
+sns.countplot(x="poutcome",data=train,hue="y")
+plt.show()
+## 前一次有存定存的下一次存定存的比例高
 
 
 # 視覺化連續型欄位
-
 
 def kde(data,var):
     plt.figure(figsize=(12,8))
@@ -110,53 +107,50 @@ def kde(data,var):
     plt.xlim((data[var].quantile(0),data[var].quantile(0.975)))
     plt.show()
 
-# age
-kde(de,"age")
-a=sns.FacetGrid(data=de,col="y")
+## age
+kde(train,"age")
+a=sns.FacetGrid(data=train,col="y")
 plt.figure(figsize=(12,8))
 a.map(sns.kdeplot,"age",fill=True)
 # 有存定存的人與沒存定存的人的年齡分布是相似的，不過在65~75歲間存定存的比例較高，與job中有存定存的比例是退休族群較高相符合
 
 
-# balance
-kde(de,"balance")
-
-a=sns.FacetGrid(data=de,col="y",height=6,aspect=8/6)
+## balance
+kde(train,"balance")
+a=sns.FacetGrid(data=train,col="y",height=6,aspect=8/6)
 a.map(sns.kdeplot,"balance",fill=True,bw_adjust=0.3)
-a.set(xlim=(de["balance"].quantile(0),de["balance"].quantile(0.975)))
-# 大部分人的balance在-1000~2000之間
-# y=1 or =0，density圖形相似，在0<balance<1000的部分 no的部分更高，代表這個區域存定存的人比例偏低
+a.set(xlim=(train["balance"].quantile(0),train["balance"].quantile(0.975)))
+## 大部分人的balance在-1000~2000之間
+## y=1 or =0，density圖形相似，在0<balance<1000的部分 no的部分更高，代表這個區域存定存的人比例偏低
 
 
-# duration
-kde(de,"duration")
-
-a=sns.FacetGrid(data=de,col="y",height=6,aspect=8/6)
+## duration
+kde(train,"duration")
+a=sns.FacetGrid(data=train,col="y",height=6,aspect=8/6)
 a.map(sns.kdeplot,"duration",fill=True,bw_adjust=0.3)
-a.set(xlim=(de["duration"].quantile(0),de["duration"].quantile(0.975)))
-# 大部分人的duration落在一年內
-# duration 200以下有存定存的比例相對於200以上的低，且yes的部分有厚尾的現象，代表duration長，會存定存的比例較高
+a.set(xlim=(train["duration"].quantile(0),train["duration"].quantile(0.975)))
+## 大部分人的duration落在一年內
+## duration 200以下有存定存的比例相對於200以上的低，且yes的部分有厚尾的現象，代表duration長，會存定存的比例較高
 
-# 日期
-sns.countplot(data=de,x="month",hue="y")
+## 日期
+sns.countplot(data=train,x="month",hue="y")
 plt.show()
-# 沒有哪個月成交量高很多
+## 沒有哪個月成交量高很多
 
-# 看數值變數間的相關性
+## 看數值變數間的相關性
 plt.figure(figsize=(12,7))
-sns.heatmap(de.corr(numeric_only=True),annot=True,cmap="coolwarm")
-# 沒有那些變數特別相關
+sns.heatmap(train.corr(numeric_only=True),annot=True,cmap="coolwarm")
+## 沒有那些變數特別相關
 
 
-# pdays
-sns.histplot(x="pdays",data=de,hue="y",multiple="stack")
+## pdays
+sns.histplot(x="pdays",data=train,hue="y",multiple="stack")
 plt.show()
-# 大部分資料為50天以內
+## 大部分資料為50天以內
 
 
-# 丟掉default
-full=pd.concat([de,test]).reset_index(drop=True)
-print(full.tail())
+# 處理default
+full=pd.concat([x_train,x_test],keys=["trainX","testX"])
 full.drop(columns="default",inplace=True)
 
 
@@ -175,40 +169,36 @@ full.loc[:,"month"]=full.loc[:,"month"].replace(['may','jun','jul','aug','oct','
 
 # education
 full.loc[:,"education"]=full["education"].replace(['tertiary','secondary','unknown','primary'],[2,1,-1,0])
-full.loc[:,"education"].astype("int")
+full.loc[:,"education"]=full.loc[:,"education"].astype("int")
 
 
-# 模型前置設定
-full["y"]=full["y"].replace({"no":0,"yes":1})
-train=full[full["y"].isna()==False]
+# 模型前置設定，將Y=1的資料增加到與Y=0的資料相比接近1:1
+x_train=full.loc["trainX"]
+train=pd.merge(x_train,y_train,left_index=True,right_index=True)
 yes=train[train["y"]==1]
 for i in range(3):
-    yes=pd.concat([yes,yes])
-  
+    yes=pd.concat([yes,yes])   
 train=pd.concat([train,yes])
-train_x=train.drop(columns="y")
-train_y=train["y"]
-test=full[full["y"].isna()==True]
-test_x=test.drop(columns="y")
+x_train=train.drop(columns="y")
+y_train=train["y"]
+x_test=full.loc["testX"]
 
 
 # 套模型並繪出各特徵權重
-rf=RandomForestClassifier(n_estimators=1000,class_weight={0:0.7,1:0.3},n_jobs=6,criterion="entropy",random_state=42,max_depth=15)
-rf.fit(train_x,train_y)
-p=pd.Series(rf.predict(test_x),name="y")
+rf=RandomForestClassifier(n_estimators=1000,class_weight={0:0.8,1:0.2},n_jobs=6,criterion="gini",random_state=42,max_depth=20)
+rf.fit(x_train,y_train)
+p=pd.Series(rf.predict(x_test),name="y")
 feature=pd.DataFrame({"feature_name":rf.feature_names_in_,"feature_importance":rf.feature_importances_})
 feature.plot(x="feature_name",kind="bar")
 
 
 #  繪製confusion matrix
-verify=pd.read_csv("test.csv",sep=",")
-verify=verify["y"].replace({"no":0,"yes":1})
-cm=confusion_matrix(verify,p)
-cm_df = pd.DataFrame(cm)
+cm=confusion_matrix(y_test,p)
 plt.figure(figsize=(10, 6))
-sns.heatmap(cm_df, annot=True, fmt='d', cmap='Reds')
+sns.heatmap(pd.DataFrame(cm), annot=True, fmt='d', cmap='Reds')
 plt.xlabel("predict")
-plt.ylabel("real")
+plt.ylabel("r\ne\na\nl",rotation=0)
+plt.show()
 
 
 
