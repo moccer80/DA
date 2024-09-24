@@ -55,7 +55,7 @@ sns.barplot(data=df,x="job",y="having term deposit ratio")
 plt.xticks(rotation=45)
 plt.show()
 # 成功推銷定存比例最高的族群是學生，其次是退休人群
-# 成功推銷定存比例最高的族群是學生，其次是退休人群
+
 
 
 ## marital
