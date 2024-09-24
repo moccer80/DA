@@ -14,7 +14,7 @@ from sklearn.metrics import confusion_matrix
 
 
 
-# 引入資料與檢視
+# 引入資料與檢視，因test資料包含於train中，故僅用train資料進行分析
 # 資料說明不清與重複，故清除loan、campaign、previous欄位
 pd.set_option("display.max_columns",None)
 pd.set_option("display.precision",4)
