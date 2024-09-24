@@ -159,15 +159,15 @@ display(full.head())
 def change_code(data,var):
     data[var]=data[var].astype("category").cat.codes
 
-# job marital housing contact pdays poutcome
+## job marital housing contact pdays poutcome
 A=["job","marital","housing","contact","pdays","poutcome"]
 for i in A:
     change_code(full,i)
 
-# month
+## month
 full.loc[:,"month"]=full.loc[:,"month"].replace(['may','jun','jul','aug','oct','nov','dec','jan','feb','mar','apr','sep'],[5,6,7,8,10,11,12,1,2,3,4,9])
 
-# education
+## education
 full.loc[:,"education"]=full["education"].replace(['tertiary','secondary','unknown','primary'],[2,1,-1,0])
 full.loc[:,"education"]=full.loc[:,"education"].astype("int")
 
